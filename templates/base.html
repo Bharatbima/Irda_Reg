@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}IRDAI Analysis{% endblock %} — Bharat Bima</title>
+  <link rel="stylesheet" href="/static/style.css">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-name">Bharat Bima</span>
+        <span class="brand-divider">|</span>
+        <span class="brand-sub">IRDAI Consultation 2026</span>
+      </div>
+      {% if user_email %}
+      <nav class="site-nav">
+        <a href="/chat" class="nav-link {% if section == 'chat' %}active{% endif %}">Ask the Documents</a>
+        <a href="/analysis" class="nav-link {% if section == 'analysis' %}active{% endif %}">Our Analysis</a>
+        <a href="/submission" class="nav-link {% if section == 'submission' %}active{% endif %}">Submission List</a>
+      </nav>
+      <div class="header-user">
+        <span class="user-email">{{ user_email }}</span>
+        <a href="/logout" class="logout-link">Sign out</a>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      IRDAI Consultation Paper — Recalibrating Economics of Insurance Distribution &nbsp;·&nbsp;
+      Deadline: 25 Oct 2026 &nbsp;·&nbsp; Bharat Bima Insurance Broking (Internal)
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="page-home">
+  <div class="home-hero">
+    <h1 class="home-title">IRDAI Consultation 2026</h1>
+    <p class="home-subtitle">
+      Recalibrating Economics of Insurance Distribution<br>
+      <strong>Submission deadline: 25 October 2026</strong>
+    </p>
+  </div>
+
+  <div class="section-cards">
+    <a href="/chat" class="section-card">
+      <div class="card-icon">&#x1F4AC;</div>
+      <h2 class="card-title">Ask the Documents</h2>
+      <p class="card-desc">
+        Query the consultation paper and supporting data paper directly.
+        Every answer is grounded in — and cites — the source text.
+      </p>
+      <span class="card-link">Open chat &rarr;</span>
+    </a>
+
+    <a href="/analysis" class="section-card">
+      <div class="card-icon">&#x1F4CB;</div>
+      <h2 class="card-title">Our Analysis</h2>
+      <p class="card-desc">
+        Our internal theses, corrected findings, cost/benefit ledger,
+        opportunity watchlist, and submission checklist.
+      </p>
+      <span class="card-link">Browse docs &rarr;</span>
+    </a>
+
+    <a href="/submission" class="section-card">
+      <div class="card-icon">&#x270F;</div>
+      <h2 class="card-title">Submission List</h2>
+      <p class="card-desc">
+        Draft answers to the 32 consultation questions.
+        See what each team member has written and mark a final answer per question.
+      </p>
+      <span class="card-link">View questions &rarr;</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

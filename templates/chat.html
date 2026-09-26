@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}Ask the Documents{% endblock %}
+
+{% block extra_head %}
+<style>
+  .site-main { padding: 0; display: flex; flex-direction: column; height: calc(100vh - 56px - 36px); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-layout">
+  <div class="chat-sidebar">
+    <h3 class="sidebar-title">Ask the Documents</h3>
+    <p class="sidebar-desc">
+      Questions are answered only from the IRDAI consultation paper and
+      supporting data paper. Every claim is cited by paragraph, section,
+      or table number.
+    </p>
+
+    {% if not docs_ready %}
+    <div class="alert alert-warning sidebar-warning">
+      Source documents have not been extracted yet. Run
+      <code>python extract.py</code> to enable this feature.
+    </div>
+    {% else %}
+    <div class="sidebar-meta">
+      <span class="meta-label">Content as of</span>
+      <span class="meta-value">{{ extraction_date }}</span>
+    </div>
+    {% endif %}
+
+    <button class="btn btn-secondary btn-sm sidebar-clear" id="clearHistory">
+      Clear conversation
+    </button>
+
+    <div class="sidebar-hint">
+      <strong>Tips:</strong>
+      <ul>
+        <li>Ask about specific paragraphs: "What does Para 45 say about…"</li>
+        <li>Ask for table data: "What does Table 3 show?"</li>
+        <li>Ask comparative questions across both papers</li>
+      </ul>
+      <p>Conversation is stored in your browser only — refreshing starts fresh.</p>
+    </div>
+  </div>
+
+  <div class="chat-main">
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-empty" id="chatEmpty">
+        <p>Ask a question about the IRDAI consultation paper to get started.</p>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <form id="chatForm" class="chat-form">
+        <textarea
+          id="chatInput"
+          class="chat-textarea"
+          placeholder="Ask a question about the paper…"
+          rows="3"
+          {% if not docs_ready %}disabled{% endif %}
+        ></textarea>
+        <button type="submit" class="btn btn-primary chat-send" id="chatSend" {% if not docs_ready %}disabled{% endif %}>
+          Send
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'irda_chat_v1';
+
+let history = [];
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) history = JSON.parse(raw);
+  } catch (e) {
+    history = [];
+  }
+}
+
+function saveHistory() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+}
+
+function renderMessages() {
+  const container = document.getElementById('chatMessages');
+  const empty = document.getElementById('chatEmpty');
+
+  if (history.length === 0) {
+    empty.style.display = 'flex';
+    // Remove all message nodes except the empty placeholder
+    Array.from(container.children).forEach(el => {
+      if (el !== empty) el.remove();
+    });
+    return;
+  }
+
+  empty.style.display = 'none';
+  Array.from(container.children).forEach(el => {
+    if (el !== empty) el.remove();
+  });
+
+  history.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'chat-message chat-message--' + msg.role;
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.innerHTML = escapeHtml(msg.content);
+    div.appendChild(bubble);
+    container.appendChild(div);
+  });
+
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendMessage(text) {
+  history.push({ role: 'user', content: text });
+  renderMessages();
+  saveHistory();
+
+  const sendBtn = document.getElementById('chatSend');
+  const input = document.getElementById('chatInput');
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Thinking…';
+
+  // Optimistic loading indicator
+  const container = document.getElementById('chatMessages');
+  const thinking = document.createElement('div');
+  thinking.className = 'chat-message chat-message--assistant';
+  thinking.id = 'thinkingMsg';
+  thinking.innerHTML = '<div class="chat-bubble chat-bubble--loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+  container.appendChild(thinking);
+  container.scrollTop = container.scrollHeight;
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history }),
+    });
+    const data = await resp.json();
+
+    if (data.error) {
+      history.push({ role: 'assistant', content: '⚠ Error: ' + data.error });
+    } else {
+      history.push({ role: 'assistant', content: data.answer });
+    }
+  } catch (err) {
+    history.push({ role: 'assistant', content: '⚠ Network error — please try again.' });
+  }
+
+  const thinkingEl = document.getElementById('thinkingMsg');
+  if (thinkingEl) thinkingEl.remove();
+
+  saveHistory();
+  renderMessages();
+  sendBtn.disabled = false;
+  sendBtn.textContent = 'Send';
+  input.focus();
+}
+
+document.getElementById('chatForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = '';
+  await sendMessage(text);
+});
+
+// Ctrl/Cmd+Enter to submit
+document.getElementById('chatInput').addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+  }
+});
+
+// Auto-expand textarea
+document.getElementById('chatInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+});
+
+document.getElementById('clearHistory').addEventListener('click', () => {
+  if (confirm('Clear the conversation history? This cannot be undone.')) {
+    history = [];
+    saveHistory();
+    renderMessages();
+  }
+});
+
+// Init
+loadHistory();
+renderMessages();
+</script>
+{% endblock %}

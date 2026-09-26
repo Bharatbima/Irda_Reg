@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+
+# Generated extraction output — regenerated from PDFs at build time
+extracted/
+
+# Persistent data volume — managed by Railway, not committed
+data/
+
+# Source PDFs — large files, share out-of-band
+source_docs/*.pdf

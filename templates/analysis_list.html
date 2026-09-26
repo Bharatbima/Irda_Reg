@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Our Analysis{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h1 class="page-title">Our Analysis</h1>
+    <p class="page-desc">
+      Internal research documents — theses, corrected findings, cost/benefit ledger,
+      opportunity watchlist, and submission checklist. Read-only; updated on redeploy.
+    </p>
+  </div>
+
+  {% if docs %}
+  <div class="doc-grid">
+    {% for doc in docs %}
+    <a href="/analysis/{{ doc.slug }}" class="doc-card">
+      <div class="doc-card-icon">&#x1F4C4;</div>
+      <div class="doc-card-body">
+        <h2 class="doc-card-title">{{ doc.title }}</h2>
+        <span class="doc-card-filename">{{ doc.filename }}</span>
+      </div>
+      <span class="doc-card-arrow">&rarr;</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">&#x1F4C2;</div>
+    <h2>No analysis documents yet</h2>
+    <p>
+      Place your <code>.md</code> files in the <code>analysis/</code> folder and redeploy.
+      Expected documents: theses, corrected findings, cost/benefit ledger,
+      opportunity watchlist, submission checklist.
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

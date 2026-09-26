@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-inner page-inner--narrow">
+  <div class="doc-nav">
+    <a href="/analysis" class="back-link">&larr; All documents</a>
+  </div>
+
+  <article class="analysis-content prose">
+    {{ content | safe }}
+  </article>
+</div>
+{% endblock %}

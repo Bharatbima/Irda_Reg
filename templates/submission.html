@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block title %}Submission List{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <div class="page-header-main">
+      <h1 class="page-title">Submission List</h1>
+      <p class="page-desc">
+        Draft answers to the 32 IRDAI consultation questions.
+        Entries are append-only — nothing is deleted or edited once posted.
+        Mark one entry per question as <strong>Final</strong> to flag it for the submission.
+      </p>
+    </div>
+    <div class="page-header-meta">
+      <span class="deadline-badge">Deadline: 25 Oct 2026</span>
+    </div>
+  </div>
+
+  {% if placeholder_mode %}
+  <div class="alert alert-warning">
+    The consultation questions file (<code>questions/questions.json</code>) has not been
+    populated yet. Add the 32 IRDAI questions and redeploy.
+  </div>
+  {% else %}
+
+  <div class="submission-list" id="submissionList">
+    {% for q in questions %}
+    <div class="question-block" id="q{{ q.num }}">
+      <div class="question-header" data-qnum="{{ q.num }}">
+        <span class="q-number">Q{{ q.num }}</span>
+        <span class="q-text">{{ q.text }}</span>
+        <span class="q-toggle">&#x25BC;</span>
+      </div>
+
+      <div class="question-body">
+        {% if q.entries %}
+        <div class="entry-list" id="entries-q{{ q.num }}">
+          {% for entry in q.entries %}
+          <div class="entry {% if entry.is_final %}entry--final{% endif %}" id="entry-{{ entry.id }}">
+            <div class="entry-meta">
+              <span class="entry-author">{{ entry.display_name }}</span>
+              <span class="entry-time">{{ entry.timestamp[:16].replace('T', ' ') }} UTC</span>
+              {% if entry.is_final %}
+              <span class="entry-final-badge">&#x2713; Final</span>
+              {% endif %}
+            </div>
+            <div class="entry-text">{{ entry.text }}</div>
+            <div class="entry-actions">
+              {% if not entry.is_final %}
+              <button
+                class="btn btn-xs btn-outline mark-final-btn"
+                data-entry-id="{{ entry.id }}"
+                data-q-num="{{ q.num }}"
+              >Mark as Final</button>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-entries" id="no-entries-q{{ q.num }}">No answers yet for this question.</div>
+        {% endif %}
+
+        <div class="add-entry-form" id="form-q{{ q.num }}">
+          <h4 class="add-entry-label">Add your answer</h4>
+          <textarea
+            class="entry-textarea"
+            placeholder="Write your answer to Question {{ q.num }} here…"
+            rows="4"
+            data-q-num="{{ q.num }}"
+          ></textarea>
+          <div class="add-entry-actions">
+            <button class="btn btn-primary btn-sm submit-entry-btn" data-q-num="{{ q.num }}">
+              Submit Answer
+            </button>
+            <span class="entry-note">Visible to all team members · Cannot be edited after submission</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% endif %}
+</div>
+
+<script>
+// Toggle question body open/closed
+document.querySelectorAll('.question-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const block = header.closest('.question-block');
+    block.classList.toggle('open');
+    const toggle = header.querySelector('.q-toggle');
+    toggle.textContent = block.classList.contains('open') ? '▲' : '▼';
+  });
+});
+
+// Open question if it has a final entry (for quick review)
+document.querySelectorAll('.question-block').forEach(block => {
+  if (block.querySelector('.entry--final')) {
+    block.classList.add('open');
+    const toggle = block.querySelector('.q-toggle');
+    if (toggle) toggle.textContent = '▲';
+  }
+});
+
+// Submit a new entry
+document.querySelectorAll('.submit-entry-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const qNum = parseInt(btn.dataset.qNum, 10);
+    const form = document.getElementById('form-q' + qNum);
+    const textarea = form.querySelector('.entry-textarea');
+    const text = textarea.value.trim();
+
+    if (!text) { alert('Please write an answer before submitting.'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      const resp = await fetch('/api/submission/entry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question_num: qNum, text }),
+      });
+      const data = await resp.json();
+
+      if (data.error) {
+        alert('Error: ' + data.error);
+        btn.disabled = false;
+        btn.textContent = 'Submit Answer';
+        return;
+      }
+
+      const entry = data.entry;
+      textarea.value = '';
+
+      // Remove "no entries" message if present
+      const noEntries = document.getElementById('no-entries-q' + qNum);
+      if (noEntries) noEntries.remove();
+
+      // Create and insert new entry DOM
+      let list = document.getElementById('entries-q' + qNum);
+      if (!list) {
+        list = document.createElement('div');
+        list.className = 'entry-list';
+        list.id = 'entries-q' + qNum;
+        form.parentNode.insertBefore(list, form);
+      }
+
+      const entryEl = document.createElement('div');
+      entryEl.className = 'entry';
+      entryEl.id = 'entry-' + entry.id;
+      entryEl.innerHTML = `
+        <div class="entry-meta">
+          <span class="entry-author">${escHtml(entry.display_name)}</span>
+          <span class="entry-time">${entry.timestamp.slice(0,16).replace('T',' ')} UTC</span>
+        </div>
+        <div class="entry-text">${escHtml(entry.text)}</div>
+        <div class="entry-actions">
+          <button class="btn btn-xs btn-outline mark-final-btn"
+            data-entry-id="${entry.id}" data-q-num="${qNum}">Mark as Final</button>
+        </div>
+      `;
+      list.appendChild(entryEl);
+      attachMarkFinal(entryEl.querySelector('.mark-final-btn'));
+    } catch (err) {
+      alert('Network error — please try again.');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Submit Answer';
+  });
+});
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+
+function attachMarkFinal(btn) {
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const entryId = btn.dataset.entryId;
+    const qNum = parseInt(btn.dataset.qNum, 10);
+
+    if (!confirm('Mark this answer as the Final answer for Question ' + qNum + '? Any previously marked Final answer for this question will be unmarked.')) return;
+
+    btn.disabled = true;
+
+    try {
+      const resp = await fetch(`/api/submission/entry/${entryId}/final`, { method: 'POST' });
+      const data = await resp.json();
+      if (data.error) { alert('Error: ' + data.error); btn.disabled = false; return; }
+
+      // Update UI: unmark all finals for this question, mark this one
+      document.querySelectorAll(`#q${qNum} .entry--final`).forEach(el => {
+        el.classList.remove('entry--final');
+        const badge = el.querySelector('.entry-final-badge');
+        if (badge) badge.remove();
+        // Restore mark-final button if not already there
+        const actions = el.querySelector('.entry-actions');
+        const existBtn = actions.querySelector('.mark-final-btn');
+        if (!existBtn) {
+          const newBtn = document.createElement('button');
+          newBtn.className = 'btn btn-xs btn-outline mark-final-btn';
+          newBtn.dataset.entryId = el.id.replace('entry-','');
+          newBtn.dataset.qNum = qNum;
+          newBtn.textContent = 'Mark as Final';
+          actions.appendChild(newBtn);
+          attachMarkFinal(newBtn);
+        }
+      });
+
+      const entryEl = document.getElementById('entry-' + entryId);
+      entryEl.classList.add('entry--final');
+      const meta = entryEl.querySelector('.entry-meta');
+      const badge = document.createElement('span');
+      badge.className = 'entry-final-badge';
+      badge.innerHTML = '&#x2713; Final';
+      meta.appendChild(badge);
+      btn.remove();
+
+    } catch (err) {
+      alert('Network error — please try again.');
+      btn.disabled = false;
+    }
+  });
+}
+
+// Attach mark-final handlers to existing buttons
+document.querySelectorAll('.mark-final-btn').forEach(attachMarkFinal);
+</script>
+{% endblock %}

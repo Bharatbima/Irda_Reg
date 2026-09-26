@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign In — Bharat Bima IRDAI Analysis</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="login-body">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">BB</div>
+        <h1 class="login-title">Bharat Bima</h1>
+        <p class="login-subtitle">IRDAI Consultation Analysis — Internal Tool</p>
+      </div>
+
+      {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="/login" class="login-form">
+        <div class="form-group">
+          <label for="code" class="form-label">Access Code</label>
+          <input
+            type="password"
+            id="code"
+            name="code"
+            class="form-input code-input"
+            placeholder="6-digit code"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            autofocus
+            required
+          >
+          <p class="form-hint">Enter the 6-digit code assigned to you.</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+      </form>
+    </div>
+
+    <p class="login-footer-note">
+      This tool is for authorised Bharat Bima team members only.<br>
+      Contact your administrator if you have not received an access code.
+    </p>
+  </div>
+</body>
+</html>

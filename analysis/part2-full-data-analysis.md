@@ -58,6 +58,7 @@ description: Complete extraction of Part 2's product-wise and channel-wise commi
 
 ### A6. Total Expense to GDPI Ratio, by Insurer — EoM Impact (Annexure 4, Table 11A)
 Insurers in business 5+ years, grouped by FY25 market-share band, showing the trend FY19→FY26. Sample (anonymized labels as published; full table runs to ~31 insurers):
+
 | Insurer | Market Share FY25 | FY19 | FY23 | FY24 | FY25 | FY26 |
 |---|---|---|---|---|---|---|
 | NL1 | Above 10% | 24% | 21% | 21% | 18% | 23% |
@@ -199,6 +200,7 @@ Insurers in business 5+ years, grouped by FY25 market-share band, showing the tr
 
 ### B13. Total Expense to Total Premium Ratio, by Insurer — EoM Impact (Annexure 3, Table 13A)
 Insurers in business 5+ years, grouped by FY25 market-share band, FY21→FY26 trend. Sample:
+
 | Insurer | Market Share FY25 | FY21 | FY23 | FY24 | FY25 | FY26 |
 |---|---|---|---|---|---|---|
 | L1 | Above 10% | 14% | 16% | 16% | 12% | 12% |

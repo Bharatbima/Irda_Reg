@@ -5,8 +5,9 @@ __pycache__/
 venv/
 node_modules/
 
-# Generated extraction output — regenerated from PDFs at build time
-extracted/
+# Extracted JSON files ARE committed (prebuilt from PDFs so Railway doesn't need them)
+# Only exclude the source PDFs themselves (too large)
+extracted/*.pdf
 
 # Persistent data volume — managed by Railway, not committed
 data/

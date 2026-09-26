@@ -163,9 +163,10 @@ _SYSTEM_PROMPT_BASE = (
     "the consultation paper 'Recalibrating Economics of Insurance Distribution' "
     "(main paper + supporting data paper).\n\n"
     "Rules:\n"
-    "1. Every factual claim MUST cite the exact paragraph number (e.g. 'Para 45'), "
-    "section header (e.g. 'Section 9'), or table label (e.g. 'Table 3') as it appears "
-    "verbatim in the source text.\n"
+    "1. Every factual claim MUST cite the exact marker as it appears in the source text. "
+    "Paragraph markers appear as [Para N] (e.g. [Para 45]); cite these as 'Para 45'. "
+    "Section headers appear as 'Section N' (e.g. Section 9). "
+    "Tables are 'Table N', Graphs are 'Graph N', Boxes are 'Box N'.\n"
     "2. If a question is not covered in the source documents, say explicitly: "
     "'This is not covered in the source documents.'\n"
     "3. Do not infer, speculate, or use outside knowledge.\n"
@@ -181,8 +182,15 @@ SYSTEM_PROMPT: str = _SYSTEM_PROMPT_BASE + EXTRACTED_TEXT
 # ---------------------------------------------------------------------------
 
 _CITE_RE = re.compile(
-    r'\b(?:Para(?:graph)?\s+\d+|Section\s+\d+(?:\.\d+)*'
-    r'|Table\s+\d+|Annexure\s+(?:\d+|[IVX]+)|Annex\s+(?:\d+|[IVX]+))\b',
+    r'\b(?:'
+    r'Para(?:graph)?\s+\d+'
+    r'|Section\s+\d+(?:\.\d+)*'
+    r'|Table\s+\d+'
+    r'|Graph\s+\d+'
+    r'|Box\s+\d+[A-Z]?'
+    r'|Annexure\s+(?:\d+|[IVX]+)'
+    r'|Annex\s+(?:\d+|[IVX]+)'
+    r')\b',
     re.IGNORECASE,
 )
 

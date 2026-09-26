@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Original Documents{% endblock %}
+
+{% block content %}
+<div class="page-inner page-inner--narrow">
+  <div class="subtab-nav">
+    {% for key, label in tab_labels.items() %}
+    <a href="/original-documents/{{ key }}"
+       class="subtab-link {% if active_tab == key %}subtab-link--active{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <article class="analysis-content prose">
+    {{ content | safe }}
+  </article>
+</div>
+{% endblock %}

@@ -29,11 +29,21 @@
     <div class="question-block" id="q{{ q.num }}">
       <div class="question-header" data-qnum="{{ q.num }}">
         <span class="q-number">Q{{ q.num }}</span>
+        {% if q.tag %}
+        <span class="tag-badge tag-badge--{{ q.tag | lower | replace(' ', '-') }}">{{ q.tag }}</span>
+        {% endif %}
         <span class="q-text">{{ q.text }}</span>
         <span class="q-toggle">&#x25BC;</span>
       </div>
 
       <div class="question-body">
+        {% if q.stance_html %}
+        <div class="checklist-stance prose">
+          <div class="stance-label">Draft stance from checklist</div>
+          {{ q.stance_html | safe }}
+        </div>
+        {% endif %}
+
         {% if q.entries %}
         <div class="entry-list" id="entries-q{{ q.num }}">
           {% for entry in q.entries %}

@@ -17,9 +17,11 @@
       </div>
       {% if user_email %}
       <nav class="site-nav">
+        <a href="/original-documents" class="nav-link {% if section == 'original-documents' %}active{% endif %}">Original Documents</a>
+        <a href="/our-analysis" class="nav-link {% if section == 'our-analysis' %}active{% endif %}">Our Analysis</a>
+        <a href="/opportunities" class="nav-link {% if section == 'opportunities' %}active{% endif %}">Opportunities &amp; Risks</a>
+        <a href="/submission" class="nav-link {% if section == 'submission' %}active{% endif %}">Submission</a>
         <a href="/chat" class="nav-link {% if section == 'chat' %}active{% endif %}">Ask the Documents</a>
-        <a href="/analysis" class="nav-link {% if section == 'analysis' %}active{% endif %}">Our Analysis</a>
-        <a href="/submission" class="nav-link {% if section == 'submission' %}active{% endif %}">Submission List</a>
       </nav>
       <div class="header-user">
         <span class="user-email">{{ user_email }}</span>

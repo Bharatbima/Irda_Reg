@@ -59,7 +59,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # ---------------------------------------------------------------------------
-# Rate limiting (in-memory; resets on server restart — acceptable per spec)
+# Rate limiting (in-memory; resets on server restart)
 # ---------------------------------------------------------------------------
 
 LOCKOUT_THRESHOLD = 5
@@ -209,7 +209,6 @@ _KNOWN_NORM: frozenset[str] = frozenset(_norm(x) for x in KNOWN_MARKERS)
 def validate_citations(text: str) -> str:
     """Replace unverifiable citation markers with a flagged note."""
     if not _KNOWN_NORM:
-        # Extracted text not yet available — pass through unchanged
         return text
 
     def replacer(m: re.Match) -> str:
@@ -320,19 +319,54 @@ def load_questions() -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Analysis documents
+# Our Analysis — grouped document list
 # ---------------------------------------------------------------------------
 
-def load_analysis_docs() -> list[dict]:
-    """Return metadata list for all .md files in analysis/."""
-    docs = []
-    for md_file in sorted(Path("analysis").glob("*.md")):
-        text = md_file.read_text(encoding="utf-8")
-        # Derive title from first # heading or filename
-        title_match = re.search(r'^#{1,2}\s+(.+)$', text, re.MULTILINE)
-        title = title_match.group(1).strip() if title_match else md_file.stem.replace("_", " ").replace("-", " ").title()
-        docs.append({"slug": md_file.stem, "title": title, "filename": md_file.name})
-    return docs
+ANALYSIS_GROUP_SLUGS = [
+    ("Foundation", [
+        "bharat-bima-context",
+        "section-by-section-corrected-log",
+    ]),
+    ("Business Model Theses", [
+        "affinity-model-unbundling-thesis",
+        "tractor-oem-model",
+        "commercial-lines-thesis",
+    ]),
+    ("Compliance & Tracking", [
+        "compliance-cost-benefit-ledger",
+        "outcome-assessment-parameters-tracker",
+    ]),
+    ("Forward-Looking", [
+        "opportunity-watchlist",
+    ]),
+]
+
+
+def _doc_title(slug: str) -> str:
+    path = Path("analysis") / f"{slug}.md"
+    if not path.exists():
+        return slug.replace("-", " ").title()
+    text = path.read_text(encoding="utf-8")
+    m = re.search(r'^#{1,2}\s+(.+)$', text, re.MULTILINE)
+    return m.group(1).strip() if m else slug.replace("-", " ").title()
+
+
+def load_our_analysis_grouped() -> list[dict]:
+    """Return list of {group, docs: [{slug, title, filename}]}."""
+    groups = []
+    for group_name, slugs in ANALYSIS_GROUP_SLUGS:
+        docs = []
+        for slug in slugs:
+            if not (Path("analysis") / f"{slug}.md").exists():
+                continue
+            docs.append({
+                "slug": slug,
+                "title": _doc_title(slug),
+                "filename": f"{slug}.md",
+            })
+        if docs:
+            groups.append({"group": group_name, "docs": docs})
+    return groups
 
 
 def render_analysis_doc(slug: str) -> Optional[str]:
@@ -341,6 +375,111 @@ def render_analysis_doc(slug: str) -> Optional[str]:
         return None
     text = path.read_text(encoding="utf-8")
     return md_lib.markdown(text, extensions=["tables", "fenced_code", "toc"])
+
+
+# ---------------------------------------------------------------------------
+# Original Documents — Part 1 and Part 2
+# ---------------------------------------------------------------------------
+
+ORIG_DOC_SLUGS = {
+    "part1": "irda-distribution-reforms-part1-full-breakdown",
+    "part2": "part2-full-data-analysis",
+}
+
+ORIG_DOC_LABELS = {
+    "part1": "Part 1 — The Paper",
+    "part2": "Part 2 — The Data",
+}
+
+
+# ---------------------------------------------------------------------------
+# Opportunities & Risks — source linkification
+# ---------------------------------------------------------------------------
+
+SOURCE_URL_MAP = {
+    "affinity-model-unbundling-thesis.md": "/our-analysis/affinity-model-unbundling-thesis",
+    "tractor-oem-model.md": "/our-analysis/tractor-oem-model",
+    "commercial-lines-thesis.md": "/our-analysis/commercial-lines-thesis",
+    "opportunity-watchlist.md": "/our-analysis/opportunity-watchlist",
+    "section-by-section-corrected-log.md": "/our-analysis/section-by-section-corrected-log",
+    "compliance-cost-benefit-ledger.md": "/our-analysis/compliance-cost-benefit-ledger",
+    "outcome-assessment-parameters-tracker.md": "/our-analysis/outcome-assessment-parameters-tracker",
+    "bharat-bima-context.md": "/our-analysis/bharat-bima-context",
+    "part2-full-data-analysis.md": "/original-documents/part2",
+    "irda-distribution-reforms-part1-full-breakdown.md": "/original-documents/part1",
+    "submission-checklist.md": "/submission",
+    "opportunities-and-risks.md": "/opportunities",
+}
+
+
+def linkify_sources(html: str) -> str:
+    """Replace bare filename.md references in rendered HTML with anchor tags."""
+    for filename, url in SOURCE_URL_MAP.items():
+        html = re.sub(
+            rf'\b{re.escape(filename)}\b',
+            f'<a href="{url}">{filename}</a>',
+            html,
+        )
+    return html
+
+
+def render_opportunities() -> str:
+    path = Path("analysis/opportunities-and-risks.md")
+    if not path.exists():
+        return "<p>Document not found.</p>"
+    text = path.read_text(encoding="utf-8")
+    html = md_lib.markdown(text, extensions=["tables", "fenced_code"])
+    return linkify_sources(html)
+
+
+# ---------------------------------------------------------------------------
+# Submission checklist parser
+# ---------------------------------------------------------------------------
+
+def parse_submission_checklist() -> dict[int, dict]:
+    """
+    Parse submission-checklist.md; return {q_num: {"tag": str, "stance_html": str}}.
+    tag is one of "ANSWER", "PASS", "NEEDS INPUT", or "".
+    """
+    path = Path("analysis/submission-checklist.md")
+    if not path.exists():
+        return {}
+
+    text = path.read_text(encoding="utf-8")
+
+    # Split just before each **QN.** at the start of a line
+    blocks = re.split(r'(?m)(?=^\*\*Q\d+\.\*\*)', text)
+
+    result: dict[int, dict] = {}
+    for block in blocks:
+        q_match = re.match(r'\*\*Q(\d+)\.\*\*', block.lstrip())
+        if not q_match:
+            continue
+        q_num = int(q_match.group(1))
+
+        tag_match = re.search(r'\*\*Tag:\s*([^*\n]+)', block)
+        tag = ""
+        if tag_match:
+            tag_text = tag_match.group(1).upper()
+            if "ANSWER" in tag_text:
+                tag = "ANSWER"
+            elif "NEEDS" in tag_text:
+                tag = "NEEDS INPUT"
+            elif "PASS" in tag_text:
+                tag = "PASS"
+
+        # Stance: from **Tag: to end of block; strip trailing ## section header
+        tag_pos = block.find("**Tag:")
+        if tag_pos >= 0:
+            stance_raw = block[tag_pos:].strip()
+            stance_raw = re.sub(r'\n##\s+[^\n]+\s*$', '', stance_raw).strip()
+            stance_html = md_lib.markdown(stance_raw, extensions=["tables"])
+        else:
+            stance_html = ""
+
+        result[q_num] = {"tag": tag, "stance_html": stance_html}
+
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -411,90 +550,77 @@ async def home(request: Request):
 
 
 # ---------------------------------------------------------------------------
-# Routes — Chat
+# Routes — Original Documents
 # ---------------------------------------------------------------------------
 
-@app.get("/chat", response_class=HTMLResponse)
-async def chat_page(request: Request):
+@app.get("/original-documents", response_class=HTMLResponse)
+async def original_docs_root(request: Request):
+    result = require_user_html(request)
+    if isinstance(result, RedirectResponse):
+        return result
+    return RedirectResponse("/original-documents/part1", status_code=303)
+
+
+@app.get("/original-documents/{tab}", response_class=HTMLResponse)
+async def original_docs(request: Request, tab: str):
     result = require_user_html(request)
     if isinstance(result, RedirectResponse):
         return result
     user_email = result
 
-    extraction_display = "not yet extracted"
-    if EXTRACTION_DATE:
-        try:
-            dt = datetime.fromisoformat(EXTRACTION_DATE)
-            extraction_display = dt.strftime("%-d %b %Y, %H:%M UTC")
-        except Exception:
-            extraction_display = EXTRACTION_DATE
+    if tab not in ORIG_DOC_SLUGS:
+        return HTMLResponse("Not found", status_code=404)
 
-    docs_ready = bool(EXTRACTED_TEXT)
+    slug = ORIG_DOC_SLUGS[tab]
+    html_content = render_analysis_doc(slug)
+    if html_content is None:
+        html_content = (
+            "<p>Document not yet available. "
+            "Place the markdown file in <code>analysis/</code> and redeploy.</p>"
+        )
+
     return templates.TemplateResponse(
-        "chat.html",
+        "original_docs.html",
         {
             "request": request,
             "user_email": user_email,
-            "section": "chat",
-            "extraction_date": extraction_display,
-            "docs_ready": docs_ready,
+            "section": "original-documents",
+            "active_tab": tab,
+            "tab_labels": ORIG_DOC_LABELS,
+            "content": html_content,
         },
     )
 
 
-@app.post("/api/chat")
-async def chat_api(request: Request):
-    result = require_user_api(request)
-    if isinstance(result, JSONResponse):
-        return result
-
-    if not EXTRACTED_TEXT:
-        return JSONResponse(
-            {"error": "Source documents have not been extracted yet. Run extract.py first."},
-            status_code=503,
-        )
-
-    body = await request.json()
-    messages = body.get("messages", [])
-    if not messages or messages[-1].get("role") != "user":
-        return JSONResponse({"error": "messages must end with a user turn"}, status_code=400)
-
-    # Limit history to last 20 turns to keep token usage reasonable
-    messages = messages[-20:]
-
-    try:
-        answer = await chat_with_claude(messages)
-    except Exception as exc:
-        return JSONResponse({"error": f"AI error: {exc}"}, status_code=502)
-
-    return JSONResponse({"answer": answer})
-
-
 # ---------------------------------------------------------------------------
-# Routes — Analysis
+# Routes — Our Analysis
 # ---------------------------------------------------------------------------
 
-@app.get("/analysis", response_class=HTMLResponse)
-async def analysis_list(request: Request):
+@app.get("/our-analysis", response_class=HTMLResponse)
+async def our_analysis_list(request: Request):
     result = require_user_html(request)
     if isinstance(result, RedirectResponse):
         return result
     user_email = result
-    docs = load_analysis_docs()
+    groups = load_our_analysis_grouped()
     return templates.TemplateResponse(
         "analysis_list.html",
-        {"request": request, "user_email": user_email, "section": "analysis", "docs": docs},
+        {
+            "request": request,
+            "user_email": user_email,
+            "section": "our-analysis",
+            "groups": groups,
+        },
     )
 
 
-@app.get("/analysis/{slug}", response_class=HTMLResponse)
-async def analysis_doc(request: Request, slug: str):
+@app.get("/our-analysis/{slug}", response_class=HTMLResponse)
+async def our_analysis_doc(request: Request, slug: str):
     result = require_user_html(request)
     if isinstance(result, RedirectResponse):
         return result
     user_email = result
 
-    # Sanitise slug to prevent path traversal
     if not re.fullmatch(r'[A-Za-z0-9_\-]+', slug):
         return HTMLResponse("Not found", status_code=404)
 
@@ -502,23 +628,55 @@ async def analysis_doc(request: Request, slug: str):
     if html_content is None:
         return HTMLResponse("Document not found", status_code=404)
 
-    docs = load_analysis_docs()
-    title = next((d["title"] for d in docs if d["slug"] == slug), slug)
-
+    title = _doc_title(slug)
     return templates.TemplateResponse(
         "analysis_doc.html",
         {
             "request": request,
             "user_email": user_email,
-            "section": "analysis",
+            "section": "our-analysis",
             "title": title,
             "content": html_content,
         },
     )
 
 
+# Redirect old /analysis URLs
+@app.get("/analysis", response_class=HTMLResponse)
+async def analysis_redirect(request: Request):
+    return RedirectResponse("/our-analysis", status_code=301)
+
+
+@app.get("/analysis/{slug}", response_class=HTMLResponse)
+async def analysis_doc_redirect(request: Request, slug: str):
+    return RedirectResponse(f"/our-analysis/{slug}", status_code=301)
+
+
 # ---------------------------------------------------------------------------
-# Routes — Submission List
+# Routes — Opportunities & Risks
+# ---------------------------------------------------------------------------
+
+@app.get("/opportunities", response_class=HTMLResponse)
+async def opportunities_page(request: Request):
+    result = require_user_html(request)
+    if isinstance(result, RedirectResponse):
+        return result
+    user_email = result
+
+    content = render_opportunities()
+    return templates.TemplateResponse(
+        "opportunities.html",
+        {
+            "request": request,
+            "user_email": user_email,
+            "section": "opportunities",
+            "content": content,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Routes — Submission
 # ---------------------------------------------------------------------------
 
 @app.get("/submission", response_class=HTMLResponse)
@@ -529,31 +687,32 @@ async def submission_page(request: Request):
     user_email = result
 
     questions = load_questions()
+    checklist = parse_submission_checklist()
+
     with _sub_lock:
         data = _read_submissions()
     entries = data.get("entries", [])
 
-    # Group entries by question number
     by_q: dict[int, list[dict]] = defaultdict(list)
     for e in entries:
         by_q[e["question_num"]].append(e)
 
-    # Sort entries within each question chronologically
     for q_entries in by_q.values():
         q_entries.sort(key=lambda e: e["timestamp"])
 
-    # Attach display name (first part of email before @)
     for e in entries:
         e["display_name"] = e["author_email"].split("@")[0]
 
-    questions_with_entries = [
-        {
+    questions_with_entries = []
+    for q in questions:
+        cl = checklist.get(q["num"], {})
+        questions_with_entries.append({
             **q,
             "entries": by_q.get(q["num"], []),
             "final_entry": next((e for e in by_q.get(q["num"], []) if e["is_final"]), None),
-        }
-        for q in questions
-    ]
+            "tag": cl.get("tag", ""),
+            "stance_html": cl.get("stance_html", ""),
+        })
 
     placeholder_mode = len(questions) == 0
     return templates.TemplateResponse(
@@ -604,3 +763,62 @@ async def mark_final_api(request: Request, entry_id: str):
     if not ok:
         return JSONResponse({"error": "entry not found"}, status_code=404)
     return JSONResponse({"ok": True})
+
+
+# ---------------------------------------------------------------------------
+# Routes — Chat
+# ---------------------------------------------------------------------------
+
+@app.get("/chat", response_class=HTMLResponse)
+async def chat_page(request: Request):
+    result = require_user_html(request)
+    if isinstance(result, RedirectResponse):
+        return result
+    user_email = result
+
+    extraction_display = "not yet extracted"
+    if EXTRACTION_DATE:
+        try:
+            dt = datetime.fromisoformat(EXTRACTION_DATE)
+            extraction_display = dt.strftime("%-d %b %Y, %H:%M UTC")
+        except Exception:
+            extraction_display = EXTRACTION_DATE
+
+    docs_ready = bool(EXTRACTED_TEXT)
+    return templates.TemplateResponse(
+        "chat.html",
+        {
+            "request": request,
+            "user_email": user_email,
+            "section": "chat",
+            "extraction_date": extraction_display,
+            "docs_ready": docs_ready,
+        },
+    )
+
+
+@app.post("/api/chat")
+async def chat_api(request: Request):
+    result = require_user_api(request)
+    if isinstance(result, JSONResponse):
+        return result
+
+    if not EXTRACTED_TEXT:
+        return JSONResponse(
+            {"error": "Source documents have not been extracted yet. Run extract.py first."},
+            status_code=503,
+        )
+
+    body = await request.json()
+    messages = body.get("messages", [])
+    if not messages or messages[-1].get("role") != "user":
+        return JSONResponse({"error": "messages must end with a user turn"}, status_code=400)
+
+    messages = messages[-20:]
+
+    try:
+        answer = await chat_with_claude(messages)
+    except Exception as exc:
+        return JSONResponse({"error": f"AI error: {exc}"}, status_code=502)
+
+    return JSONResponse({"answer": answer})

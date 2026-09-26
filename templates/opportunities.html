@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Opportunities &amp; Risks{% endblock %}
+
+{% block content %}
+<div class="page-inner page-inner--narrow">
+  <div class="page-header">
+    <h1 class="page-title">Opportunities &amp; Risks</h1>
+    <p class="page-desc">
+      The distilled conclusions. Full reasoning lives in the linked source documents
+      under Our Analysis — this page is the summary, not a replacement.
+    </p>
+  </div>
+
+  <article class="analysis-content prose opp-doc">
+    {{ content | safe }}
+  </article>
+</div>
+{% endblock %}

@@ -6,33 +6,34 @@
   <div class="page-header">
     <h1 class="page-title">Our Analysis</h1>
     <p class="page-desc">
-      Internal research documents — theses, corrected findings, cost/benefit ledger,
-      opportunity watchlist, and submission checklist. Read-only; updated on redeploy.
+      Internal research documents — theses, corrected section log, cost/benefit ledger,
+      and outcome tracker. Read-only; updated on redeploy.
     </p>
   </div>
 
-  {% if docs %}
-  <div class="doc-grid">
-    {% for doc in docs %}
-    <a href="/analysis/{{ doc.slug }}" class="doc-card">
-      <div class="doc-card-icon">&#x1F4C4;</div>
-      <div class="doc-card-body">
-        <h2 class="doc-card-title">{{ doc.title }}</h2>
-        <span class="doc-card-filename">{{ doc.filename }}</span>
+  {% if groups %}
+    {% for group in groups %}
+    <div class="doc-group">
+      <h2 class="doc-group-title">{{ group.group }}</h2>
+      <div class="doc-grid">
+        {% for doc in group.docs %}
+        <a href="/our-analysis/{{ doc.slug }}" class="doc-card">
+          <div class="doc-card-icon">&#x1F4C4;</div>
+          <div class="doc-card-body">
+            <h3 class="doc-card-title">{{ doc.title }}</h3>
+            <span class="doc-card-filename">{{ doc.filename }}</span>
+          </div>
+          <span class="doc-card-arrow">&rarr;</span>
+        </a>
+        {% endfor %}
       </div>
-      <span class="doc-card-arrow">&rarr;</span>
-    </a>
+    </div>
     {% endfor %}
-  </div>
   {% else %}
   <div class="empty-state">
     <div class="empty-icon">&#x1F4C2;</div>
-    <h2>No analysis documents yet</h2>
-    <p>
-      Place your <code>.md</code> files in the <code>analysis/</code> folder and redeploy.
-      Expected documents: theses, corrected findings, cost/benefit ledger,
-      opportunity watchlist, submission checklist.
-    </p>
+    <h2>No analysis documents found</h2>
+    <p>Place <code>.md</code> files in the <code>analysis/</code> folder and redeploy.</p>
   </div>
   {% endif %}
 </div>

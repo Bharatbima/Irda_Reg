@@ -598,9 +598,102 @@ code {
 .empty-state h2 { font-size: 1.2rem; color: #374151; margin-bottom: 0.5rem; }
 .empty-state p  { font-size: 0.9rem; }
 
+/* --- Original Documents — subtab nav --------------------- */
+.subtab-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0;
+}
+.subtab-link {
+  padding: 0.5rem 1.1rem 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  border-radius: 4px 4px 0 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+.subtab-link:hover { color: #1e3a5f; text-decoration: none; }
+.subtab-link--active {
+  color: #1e3a5f;
+  border-bottom-color: #1e3a5f;
+  font-weight: 700;
+}
+
+/* --- Our Analysis — grouped doc list --------------------- */
+.doc-group { margin-bottom: 2.5rem; }
+.doc-group-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* --- Tag badges (submission checklist) ------------------- */
+.tag-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+.tag-badge--answer      { background: #dcfce7; color: #15803d; }
+.tag-badge--pass        { background: #f3f4f6; color: #6b7280; }
+.tag-badge--needs-input { background: #fef3c7; color: #b45309; }
+
+/* --- Checklist stance block ------------------------------ */
+.checklist-stance {
+  background: #f8faff;
+  border: 1px solid #dbeafe;
+  border-left: 4px solid #3b82f6;
+  border-radius: 0 6px 6px 0;
+  padding: 0.85rem 1.1rem;
+  margin: 0.75rem 0 1rem;
+  font-size: 0.86rem;
+}
+.checklist-stance .stance-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #3b82f6;
+  margin-bottom: 0.4rem;
+}
+.checklist-stance p  { margin-bottom: 0.5rem; line-height: 1.6; }
+.checklist-stance p:last-child { margin-bottom: 0; }
+.checklist-stance strong { color: #1e3a5f; }
+
+/* --- Opportunities & Risks — section styling ------------- */
+.opp-doc h2 {
+  margin-top: 2.5rem;
+  padding: 0.4rem 0.85rem;
+  background: #1e3a5f;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.opp-doc h3 { font-size: 1rem; font-weight: 700; margin: 1.75rem 0 0.4rem; color: #111827; }
+
 /* --- Responsive tweaks ----------------------------------- */
+@media (max-width: 1100px) {
+  .site-nav { gap: 0; }
+  .nav-link { padding: 0.4rem 0.6rem; font-size: 0.82rem; }
+}
 @media (max-width: 900px) {
-  .section-cards { grid-template-columns: 1fr; }
+  .section-cards { grid-template-columns: repeat(2, 1fr); }
   .chat-sidebar { width: 220px; }
 }
 @media (max-width: 640px) {

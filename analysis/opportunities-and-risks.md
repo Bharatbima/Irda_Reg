@@ -41,7 +41,7 @@ description: The bottom-line conclusions pulled out of the business model theses
 
 ### 6. Non-insurance cross-sell
 **What:** Section 6 reform #7 permits IDEs/IDPs to distribute non-insurance financial products and non-financial products/services.
-**Caveat, stated honestly:** The one Section 6 item that survives practitioner review as a genuine opportunity — but the real question is how much focus/resource it pulls from core insurance broking, not a free diversification option.
+**Caveat:** The one Section 6 item that stands up as a genuine opportunity — but the real question is how much focus/resource it pulls from core insurance broking, not a free diversification option.
 **Source:** section-by-section-corrected-log.md, Section 6
 
 ### 7. Data-driven underwriting (watch only, not yet actionable)
@@ -88,5 +88,5 @@ Section 9, para 130: commission payable no later than day-after-free-look, ~7-da
 ---
 
 ## NON-ISSUES (closed — do not revisit)
-Confirmed, via practitioner correction, to have no material impact on Bharat Bima: direct premium flow (never collect/pool premium in any model), dark-pattern rules (not currently applicable), capital requirements (already capitalised at ₹1cr), training escalation (paper-only formality in practice), open architecture (already default), PoSP exclusivity (easily circumvented in practice), and the MII/Bima Sugam option (explicit decision not to pursue).
+Confirmed to have no material impact on Bharat Bima: direct premium flow (never collect/pool premium in any model), dark-pattern rules (not currently applicable), capital requirements (already capitalised at ₹1cr), training escalation (paper-only formality in practice), open architecture (already default), PoSP exclusivity (easily circumvented in practice), and the MII/Bima Sugam option (explicit decision not to pursue).
 **Source:** compliance-cost-benefit-ledger.md, NON-ISSUES; section-by-section-corrected-log.md, Section 6

@@ -124,7 +124,7 @@ Tags: **ANSWER** = we have a grounded, evidence-backed stance worth submitting. 
 ---
 
 ## Summary — where the real submission effort goes
-**Firm ANSWER candidates (8):** Q9, Q10, Q16, Q18, Q19, Q20, Q24, Q29 — all directly grounded in work already done (affinity-model-unbundling-thesis.md, tractor-oem-model.md, commercial-lines-thesis.md, part2-commission-benchmarks.md, section-by-section-corrected-log.md, opportunity-watchlist.md).
+**Firm ANSWER candidates (8):** Q9, Q10, Q16, Q18, Q19, Q20, Q24, Q29 — all directly grounded in work already done (affinity-model-unbundling-thesis.md, tractor-oem-model.md, commercial-lines-thesis.md, part2-full-data-analysis.md, section-by-section-corrected-log.md, opportunity-watchlist.md).
 **Optional/lower-priority ANSWER (Q2, Q14, Q15, Q26, Q27):** worth a line each if the submission has room, not essential.
 **NEEDS INPUT (Q31, Q32):** genuinely require direct judgment, not resolvable from documents alone.
 **Everything else: PASS** — generic questions where a submission would add no differentiated value and risks diluting the sharper points above.

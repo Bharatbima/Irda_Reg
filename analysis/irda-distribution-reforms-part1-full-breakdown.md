@@ -4,7 +4,7 @@
 **Comment deadline:** 25 October 2026 (web portal https://iib.gov.in/dr, Excel template, or email to drfeedback@iib.gov.in — use only one channel).
 **Status:** Draft for public consultation — NOT yet in force.
 
-This document captures the original recommendations only (Part 1). Part 2 (data/analysis) and the summary comparison table are excluded per instruction — this is the primary source text.
+This document captures the original recommendations only (Part 1) — the primary source text. Part 2's data and cost analysis is covered separately in part2-full-data-analysis.md.
 
 ---
 
@@ -380,4 +380,4 @@ Note in original: exams are technically open to any IRDAI-recognised institution
 
 ---
 
-*Compiled directly from the source PDF text — no data from Part 2 (cost analysis) or the separate summary comparison table is included here.*
+*This is the source text only — see section-by-section-corrected-log.md for the current-state / impact / opportunity assessment against each section.*

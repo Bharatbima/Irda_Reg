@@ -1,6 +1,6 @@
 # IRDAI Outcome Assessment Parameters — Tracker
 ### Source: Consultation Paper Section 1 (para 22), objective-to-parameter mapping table
-**Purpose:** This is IRDAI's own scorecard for judging whether the distribution reforms worked. Extracted in full so Bharat Bima can track against it proactively — get ahead of what the regulator will measure, before it's measured sector-wide.
+**Purpose:** This is IRDAI's own scorecard for judging whether the distribution reforms worked. Extracted in full so Bharat Bima can track against it proactively — getting ahead of what the regulator will measure, before it's measured sector-wide.
 
 ---
 
@@ -43,22 +43,20 @@
 
 ## Key Reads
 
-1. **Objective 8's "commission behaviour of IDEs in open architecture"** is the only parameter that names IDEs directly as a conduct-risk target. As an open-architecture IDE, Bharat Bima *is* the subject of this metric. Highest-priority item to self-monitor and proactively manage.
+1. **Objective 8's "commission behaviour of IDEs in open architecture"** is the only parameter that names IDEs directly as a conduct-risk target. As an open-architecture IDE, Bharat Bima is the direct subject of this metric — the highest-priority item to self-monitor.
 
-2. **Objective 2 and 3 (9 parameters total) are Broker/IDE-only** — entirely about new-entrant counts and geographic spread (small-town/rural presence). IRDAI has no baseline data on these yet. First movers who can document their numbers here set the reference point others get compared against.
+2. **Objectives 2 and 3 (9 parameters total) are Broker/IDE-only** — entirely about new-entrant counts and geographic spread (small-town/rural presence). IRDAI has no baseline data on these yet, so first movers who document their own numbers here set the reference point others get compared against.
 
-3. **EoM ratio (Objective 4) is Insurer-only** — Bharat Bima isn't directly EoM-capped, but commission receipts feed the insurer's EoM math (Section 7). Expect downward commission pressure from insurers managing their own glide path, ahead of and beyond Bharat Bima's own commission caps.
+3. **EoM ratio (Objective 4) is Insurer-only** — Bharat Bima isn't directly EoM-capped, but commission receipts feed the insurer's EoM math (Section 7). Downward commission pressure should be expected from insurers managing their own glide path, ahead of and beyond Bharat Bima's own commission caps.
 
-4. **Objective 9 disclosure duty is split by entity type**: insurers disclose product/claims/grievance performance; *large distributors* disclose customer-facing performance separately. If Bharat Bima's insurance-related revenue crosses the "large distributor" threshold (likely tied to the ₹50cr/₹100cr thresholds already defined in Section 7 for disclosure/cost-audit), this becomes a direct, standalone obligation.
+4. **Objective 9's disclosure duty is split by entity type**: insurers disclose product/claims/grievance performance; large distributors disclose customer-facing performance separately. If Bharat Bima's insurance-related revenue crosses the "large distributor" threshold (likely tied to the ₹50cr/₹100cr thresholds already defined in Section 7 for disclosure/cost-audit), this becomes a direct, standalone obligation.
 
-## Proactive Compliance Angle
+## Proactive Compliance Positioning
 
-Rationale: nothing in the paper requires early/voluntary compliance — but demonstrating good standing on these exact metrics, ahead of mandate, is a differentiator IRDAI itself would notice (there is no penalty for measuring ahead of the regulation, and Section 16 language rewards "good market conduct" broadly). Candidate self-tracking items, in priority order:
+Nothing in the paper requires early or voluntary compliance — but demonstrating good standing on these exact metrics, ahead of mandate, is a differentiator IRDAI would notice; there is no penalty for measuring ahead of the regulation, and Section 16's language rewards good market conduct broadly. Candidate self-tracking items, in priority order:
 - Commission behaviour transparency in open architecture (Objective 8) — track and be ready to show voluntarily.
 - Under-served-area business volume (Objective 7b) and rural/small-town IDE presence (Objective 2d/2e) — quantify current book split by geography now, even though not yet mandated.
 - Customer-facing performance disclosure (Objective 9b) — could be published on Bharat Bima's website ahead of any "large distributor" threshold trigger, positioning ahead of the curve.
 - Complaint/grievance nature tracking (Objective 7c/7d, 8a) — internal log now, before Bima Bharosa-linked reporting is formalized.
 
-This proactive angle was later given a concrete home: see opportunity-watchlist.md, entry 2 (Section 15 — proactive best-practices/transparency play).
-
-**Next step when we return to this:** define exact numbers/thresholds against Bharat Bima's actual book (needs internal data, not assumptions) before recommending action.
+This proactive positioning is the basis of the transparency/education opportunity in opportunities-and-risks.md. Turning the above into an actual internal dashboard requires Bharat Bima's own book data (geography split, commission behaviour, complaint log) — a data-collection task, not a document-reading one.
